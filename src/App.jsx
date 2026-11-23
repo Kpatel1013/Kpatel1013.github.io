@@ -4,6 +4,14 @@ import "./index.css"
 
 const featured = projects.filter((p) => p.kicker.startsWith("Featured"))
 
+function Out({ href, className, children }) {
+  return (
+    <a className={className} href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  )
+}
+
 function useTheme() {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("theme")
@@ -100,15 +108,15 @@ export default function App() {
               <a className="btn solid" href="#work">
                 See the work
               </a>
-              <a className="btn" href={profile.resume}>
+              <Out className="btn" href={profile.resume}>
                 Resume
-              </a>
-              <a className="btn" href={profile.linkedin}>
+              </Out>
+              <Out className="btn" href={profile.linkedin}>
                 LinkedIn
-              </a>
-              <a className="btn" href={profile.github}>
+              </Out>
+              <Out className="btn" href={profile.github}>
                 GitHub
-              </a>
+              </Out>
             </div>
           </div>
           <figure className="portrait">
@@ -188,7 +196,7 @@ export default function App() {
                     Read the story
                   </button>
                   {project.href ? (
-                    <a href={project.href}>GitHub</a>
+                    <Out href={project.href}>GitHub</Out>
                   ) : null}
                 </div>
               </article>
@@ -212,9 +220,9 @@ export default function App() {
               <li className="reveal" key={point}>{point}</li>
             ))}
           </ul>
-          <a className="text-link reveal" href={experience.href}>
+          <Out className="text-link reveal" href={experience.href}>
             Cone Crusaders code
-          </a>
+          </Out>
           <div className="skills">
             {skills.map((group) => (
               <p className="reveal" key={group.label}>
@@ -228,10 +236,10 @@ export default function App() {
           <p className="section-label reveal">Contact</p>
           <h2 className="reveal">If the work fits, write me.</h2>
           <div className="contact-row reveal">
-            <a href={`mailto:${profile.email}`}>{profile.email}</a>
-            <a href={profile.linkedin}>LinkedIn</a>
-            <a href={profile.github}>GitHub</a>
-            <a href={profile.resume}>Resume PDF</a>
+            <Out href={`mailto:${profile.email}`}>{profile.email}</Out>
+            <Out href={profile.linkedin}>LinkedIn</Out>
+            <Out href={profile.github}>GitHub</Out>
+            <Out href={profile.resume}>Resume PDF</Out>
           </div>
           <p className="fine reveal">
             {profile.location} · {profile.phone}
@@ -279,8 +287,8 @@ function ProjectPanel({ project, onClose }) {
           ))}
         </ul>
         <div className="panel-links">
-          {project.href ? <a href={project.href}>Open the repository</a> : null}
-          <a href={`mailto:${profile.email}`}>Email me about this</a>
+          {project.href ? <Out href={project.href}>Open the repository</Out> : null}
+          <Out href={`mailto:${profile.email}`}>Email me about this</Out>
         </div>
       </article>
     </div>
