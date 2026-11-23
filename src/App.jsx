@@ -24,6 +24,47 @@ export default function App() {
   const [openId, setOpenId] = useState(null)
   const open = projects.find((p) => p.id === openId) ?? null
 
+  useEffect(() => {
+    const nodes = [...document.querySelectorAll(".reveal")]
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduce) {
+      nodes.forEach((node) => {
+        node.style.opacity = "1"
+        node.style.transform = "none"
+      })
+      return
+    }
+
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const height = window.innerHeight
+      const start = height * 0.98
+      const end = height * 0.58
+      const maxScroll = document.documentElement.scrollHeight - height
+      const atEnd = maxScroll - window.scrollY < 12
+      nodes.forEach((node) => {
+        const top = node.getBoundingClientRect().top
+        let progress = (start - top) / (start - end)
+        if (atEnd && top < height) progress = 1
+        progress = Math.min(1, Math.max(0, progress))
+        node.style.opacity = progress.toFixed(3)
+        node.style.transform = `translateY(${((1 - progress) * 36).toFixed(1)}px)`
+      })
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", onScroll)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [])
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : ""
@@ -87,10 +128,10 @@ export default function App() {
         </section>
 
         <section className="featured" id="featured">
-          <p className="section-label">Start here</p>
+          <p className="section-label reveal">Start here</p>
           <div className="feature-grid">
             {featured.map((project) => (
-              <button key={project.id} type="button" className="feature" onClick={() => setOpenId(project.id)}>
+              <button key={project.id} type="button" className="feature reveal" onClick={() => setOpenId(project.id)}>
                 <span>{project.kicker}</span>
                 <strong>{project.title}</strong>
                 <em>{project.blurb}</em>
@@ -100,14 +141,14 @@ export default function App() {
         </section>
 
         <section className="about" id="about">
-          <p className="section-label">About</p>
+          <p className="section-label reveal">About</p>
           <div className="about-grid">
             <div>
               {about.map((paragraph) => (
-                <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+                <p className="reveal" key={paragraph.slice(0, 24)}>{paragraph}</p>
               ))}
             </div>
-            <aside>
+            <aside className="reveal">
               <h2>Education</h2>
               <p>
                 <strong>{profile.degree}</strong>
@@ -127,11 +168,11 @@ export default function App() {
         </section>
 
         <section className="work" id="work">
-          <p className="section-label">Projects</p>
-          <h2>What I have shipped</h2>
+          <p className="section-label reveal">Projects</p>
+          <h2 className="reveal">What I have shipped</h2>
           <div className="cards">
             {projects.map((project) => (
-              <article key={project.id} className="card">
+              <article key={project.id} className="card reveal">
                 <header>
                   <span>{project.dates}</span>
                   <h3>{project.title}</h3>
@@ -156,8 +197,8 @@ export default function App() {
         </section>
 
         <section className="experience" id="experience">
-          <p className="section-label">Experience</p>
-          <div className="job">
+          <p className="section-label reveal">Experience</p>
+          <div className="job reveal">
             <div>
               <h2>{experience.role}</h2>
               <p>
@@ -168,15 +209,15 @@ export default function App() {
           </div>
           <ul className="points">
             {experience.points.map((point) => (
-              <li key={point}>{point}</li>
+              <li className="reveal" key={point}>{point}</li>
             ))}
           </ul>
-          <a className="text-link" href={experience.href}>
+          <a className="text-link reveal" href={experience.href}>
             Cone Crusaders code
           </a>
           <div className="skills">
             {skills.map((group) => (
-              <p key={group.label}>
+              <p className="reveal" key={group.label}>
                 <strong>{group.label}.</strong> {group.items.join(", ")}
               </p>
             ))}
@@ -184,15 +225,15 @@ export default function App() {
         </section>
 
         <section className="contact" id="contact">
-          <p className="section-label">Contact</p>
-          <h2>If the work fits, write me.</h2>
-          <div className="contact-row">
+          <p className="section-label reveal">Contact</p>
+          <h2 className="reveal">If the work fits, write me.</h2>
+          <div className="contact-row reveal">
             <a href={`mailto:${profile.email}`}>{profile.email}</a>
             <a href={profile.linkedin}>LinkedIn</a>
             <a href={profile.github}>GitHub</a>
             <a href={profile.resume}>Resume PDF</a>
           </div>
-          <p className="fine">
+          <p className="fine reveal">
             {profile.location} · {profile.phone}
           </p>
         </section>
