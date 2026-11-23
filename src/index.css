@@ -1,25 +1,256 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-  font: 18px/145% system-ui, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+  color-scheme: light;
+  --bg: #f3efe6;
+  --bg-2: #e7e1d4;
+  --ink: #1c1915;
+  --muted: #5e574e;
+  --line: rgba(28, 25, 21, 0.14);
+  --card: rgba(255, 252, 246, 0.72);
+  --accent: #9a4318;
+  --accent-ink: #fff8f2;
+  --shadow: 0 24px 60px rgba(48, 32, 16, 0.08);
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Outfit", "Avenir Next", sans-serif;
 }
 
-body { margin: 0; }
 
-#root {
-  max-width: 1126px;
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(900px 420px at 90% -10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 340;
+  line-height: 1.55;
+  transition: background 240ms ease, color 240ms ease;
+}
+
+a { color: inherit; }
+
+button, a, .card, .feature, .panel {
+  transition: transform 220ms ease, background 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.9rem 6vw;
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  font-family: var(--serif);
+  text-decoration: none;
+  font-size: 1.15rem;
+}
+
+.nav nav {
+  display: flex;
+  gap: 1.1rem;
+  margin-left: auto;
+}
+
+.nav a { text-decoration: none; font-size: 0.95rem; }
+
+.nav a:hover { color: var(--accent); }
+
+
+.hero, .featured, .about, .work, .experience, .contact {
+  width: min(1080px, calc(100% - 12vw));
   margin: 0 auto;
-  text-align: center;
-  min-height: 100svh;
 }
 
-h1 { color: var(--text-h); }
+.hero {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 3rem;
+  align-items: end;
+  padding: 4.5rem 0 2rem;
+}
+
+.eyebrow, .section-label, .dates {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 520; letter-spacing: -0.03em; }
+
+h1 { font-size: clamp(3.4rem, 8vw, 6.4rem); line-height: 0.92; margin: 0.2rem 0 1rem; }
+
+.headline { font-size: 1.25rem; max-width: 38rem; margin: 0; }
+
+.actions, .contact-row, .card-links, .panel-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.6rem;
+}
+
+.btn, .card-links button, .card-links a, .panel-links a, .text-link {
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn.solid, .panel-links a:first-child {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+}
+
+.btn:hover, .card-links button:hover, .card-links a:hover, .text-link:hover {
+  transform: translateY(-2px);
+}
+
+.portrait {
+  margin: 0;
+  justify-self: end;
+}
+
+.portrait img, .monogram {
+  width: min(280px, 70vw);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 1.4rem 1.4rem 0.4rem 1.4rem;
+  background:
+    linear-gradient(160deg, var(--bg-2), color-mix(in srgb, var(--accent) 35%, var(--bg-2)));
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: 4rem;
+  box-shadow: var(--shadow);
+}
+
+.portrait figcaption { margin-top: 0.7rem; color: var(--muted); font-size: 0.9rem; }
+
+.section-label { margin-bottom: 0.4rem; }
+
+.feature-grid, .cards, .about-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.feature-grid { grid-template-columns: 1.2fr 0.8fr; }
+
+.feature, .card {
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 1.2rem;
+  padding: 1.3rem 1.4rem 1.4rem;
+  box-shadow: var(--shadow);
+  color: inherit;
+  cursor: pointer;
+}
+
+.feature strong, .card h3 { display: block; font-family: var(--serif); font-size: 1.8rem; margin: 0.4rem 0; }
+
+.feature em { font-style: normal; color: var(--muted); }
+
+.about { padding: 4rem 0 1rem; }
+
+.about-grid { grid-template-columns: 1.4fr 0.8fr; align-items: start; }
+
+.about p { font-size: 1.08rem; }
+
+aside {
+  border-left: 1px solid var(--line);
+  padding-left: 1.2rem;
+}
+
+aside ul { padding-left: 1.1rem; margin: 0.4rem 0 0; }
+
+.work h2, .contact h2, .job h2 { font-size: clamp(2rem, 4vw, 3rem); margin: 0 0 1rem; }
+
+.cards { grid-template-columns: repeat(2, 1fr); }
+
+.card header p { color: var(--muted); min-height: 4.6rem; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; list-style: none; }
+
+.tags li {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+.experience, .contact { padding: 3.5rem 0 1rem; }
+
+.job { display: flex; justify-content: space-between; gap: 1rem; align-items: end; }
+
+.job p, .fine { color: var(--muted); }
+
+.points { padding-left: 1.1rem; }
+
+.skills { margin-top: 1.4rem; }
+
+.skills p { margin: 0.35rem 0; }
+
+.contact { padding-bottom: 5rem; }
+
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 10, 8, 0.46);
+  display: grid;
+  justify-items: end;
+  z-index: 8;
+}
+
+.panel {
+  width: min(640px, 100%);
+  height: 100%;
+  overflow: auto;
+  background: var(--bg);
+  padding: 2rem 1.6rem 3rem;
+  border-left: 1px solid var(--line);
+  animation: slide 280ms ease;
+}
+
+@keyframes slide {
+  from { transform: translateX(24px); opacity: 0.6; }
+}
+
+.panel h2 { font-size: 2.6rem; margin: 0.3rem 0; }
+
+.lede { font-size: 1.12rem; }
+
+.close {
+  float: right;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .nav { flex-wrap: wrap; gap: 0.55rem 1rem; }
+  .nav nav { order: 3; width: 100%; margin-left: 0; gap: 0.85rem; }
+  .hero, .feature-grid, .about-grid, .cards { grid-template-columns: 1fr; }
+  .portrait { justify-self: start; }
+  aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 1rem; }
+  .job { flex-direction: column; align-items: start; }
+}
