@@ -4,8 +4,23 @@ import "./index.css"
 
 const featured = projects.filter((p) => p.kicker.startsWith("Featured"))
 
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("theme")
+    if (saved === "light" || saved === "dark") return saved
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  })
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem("theme", theme)
+  }, [theme])
+
+  return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))]
+}
 
 export default function App() {
+  const [theme, toggleTheme] = useTheme()
   const [openId, setOpenId] = useState(null)
   const open = projects.find((p) => p.id === openId) ?? null
 
@@ -29,6 +44,9 @@ export default function App() {
           <a href="#about">About</a>
           <a href="#contact">Contact</a>
         </nav>
+        <button type="button" className="theme" onClick={toggleTheme} aria-label="Toggle color theme">
+          {theme === "dark" ? "Light" : "Dark"}
+        </button>
       </header>
 
       <main id="top">
