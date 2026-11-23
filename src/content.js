@@ -36,6 +36,7 @@ export const projects = [
   {
     id: "rag",
     title: "Document chatbot",
+    featured: true,
     kicker: "Featured · Full stack",
     dates: "August 2026 – September 2026",
     blurb: "Upload a PDF or a screenshot, then ask questions that stay on that file. Answers come back in under five seconds.",
@@ -57,6 +58,7 @@ export const projects = [
   {
     id: "gestures",
     title: "Hand gesture classifier",
+    featured: true,
     kicker: "Featured · Machine learning",
     dates: "March 2026",
     blurb: "A webcam reads one hand and a small Q-table learns to name the pose: open, fist, point, peace, or thumbs up.",

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 import { about, coursework, experience, profile, projects, skills } from "./content.js"
 import "./index.css"
 
-const featured = projects.filter((p) => p.kicker.startsWith("Featured"))
+const featuredProjects = projects.filter((project) => project.featured)
 
-function Out({ href, className, children }) {
+function ExternalLink({ href, className, children }) {
   return (
     <a className={className} href={href} target="_blank" rel="noopener noreferrer">
       {children}
@@ -16,7 +16,10 @@ function useTheme() {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("theme")
     if (saved === "light" || saved === "dark") return saved
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+
+    const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    if (systemIsDark) return "dark"
+    return "light"
   })
 
   useEffect(() => {
@@ -24,62 +27,41 @@ function useTheme() {
     localStorage.setItem("theme", theme)
   }, [theme])
 
-  return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))]
+  function toggleTheme() {
+    if (theme === "dark") setTheme("light")
+    else setTheme("dark")
+  }
+
+  return [theme, toggleTheme]
 }
 
 export default function App() {
   const [theme, toggleTheme] = useTheme()
   const [openId, setOpenId] = useState(null)
-  const open = projects.find((p) => p.id === openId) ?? null
+  const [photoOk, setPhotoOk] = useState(true)
+  const openProject = projects.find((project) => project.id === openId)
 
+  // Fade each block in once it scrolls onto the screen.
   useEffect(() => {
-    const nodes = [...document.querySelectorAll(".reveal")]
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduce) {
-      nodes.forEach((node) => {
-        node.style.opacity = "1"
-        node.style.transform = "none"
+    const blocks = document.querySelectorAll(".reveal")
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("show")
       })
-      return
-    }
+    })
 
-    let frame = 0
-    const update = () => {
-      frame = 0
-      const height = window.innerHeight
-      const start = height * 0.98
-      const end = height * 0.58
-      const maxScroll = document.documentElement.scrollHeight - height
-      const atEnd = maxScroll - window.scrollY < 12
-      nodes.forEach((node) => {
-        const top = node.getBoundingClientRect().top
-        let progress = (start - top) / (start - end)
-        if (atEnd && top < height) progress = 1
-        progress = Math.min(1, Math.max(0, progress))
-        node.style.opacity = progress.toFixed(3)
-        node.style.transform = `translateY(${((1 - progress) * 36).toFixed(1)}px)`
-      })
-    }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update)
-    }
-
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-      if (frame) cancelAnimationFrame(frame)
-    }
+    blocks.forEach((block) => observer.observe(block))
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : ""
+    if (openProject) document.body.style.overflow = "hidden"
+    else document.body.style.overflow = ""
+
     return () => {
       document.body.style.overflow = ""
     }
-  }, [open])
+  }, [openProject])
 
   return (
     <>
@@ -108,29 +90,23 @@ export default function App() {
               <a className="btn solid" href="#work">
                 See the work
               </a>
-              <Out className="btn" href={profile.resume}>
+              <ExternalLink className="btn" href={profile.resume}>
                 Resume
-              </Out>
-              <Out className="btn" href={profile.linkedin}>
+              </ExternalLink>
+              <ExternalLink className="btn" href={profile.linkedin}>
                 LinkedIn
-              </Out>
-              <Out className="btn" href={profile.github}>
+              </ExternalLink>
+              <ExternalLink className="btn" href={profile.github}>
                 GitHub
-              </Out>
+              </ExternalLink>
             </div>
           </div>
           <figure className="portrait">
-            <img
-              src="/headshot.jpg"
-              alt="Keshav Patel"
-              onError={(event) => {
-                event.currentTarget.style.display = "none"
-                event.currentTarget.nextElementSibling.hidden = false
-              }}
-            />
-            <div className="monogram" hidden>
-              KP
-            </div>
+            {photoOk ? (
+              <img src="/headshot.jpg" alt="Keshav Patel" onError={() => setPhotoOk(false)} />
+            ) : (
+              <div className="monogram">KP</div>
+            )}
             <figcaption>Computer science · robotics · retrieval</figcaption>
           </figure>
         </section>
@@ -138,7 +114,7 @@ export default function App() {
         <section className="featured" id="featured">
           <p className="section-label reveal">Start here</p>
           <div className="feature-grid">
-            {featured.map((project) => (
+            {featuredProjects.map((project) => (
               <button key={project.id} type="button" className="feature reveal" onClick={() => setOpenId(project.id)}>
                 <span>{project.kicker}</span>
                 <strong>{project.title}</strong>
@@ -153,7 +129,9 @@ export default function App() {
           <div className="about-grid">
             <div>
               {about.map((paragraph) => (
-                <p className="reveal" key={paragraph.slice(0, 24)}>{paragraph}</p>
+                <p className="reveal" key={paragraph}>
+                  {paragraph}
+                </p>
               ))}
             </div>
             <aside className="reveal">
@@ -195,9 +173,7 @@ export default function App() {
                   <button type="button" onClick={() => setOpenId(project.id)}>
                     Read the story
                   </button>
-                  {project.href ? (
-                    <Out href={project.href}>GitHub</Out>
-                  ) : null}
+                  {project.href ? <ExternalLink href={project.href}>GitHub</ExternalLink> : null}
                 </div>
               </article>
             ))}
@@ -217,12 +193,14 @@ export default function App() {
           </div>
           <ul className="points">
             {experience.points.map((point) => (
-              <li className="reveal" key={point}>{point}</li>
+              <li className="reveal" key={point}>
+                {point}
+              </li>
             ))}
           </ul>
-          <Out className="text-link reveal" href={experience.href}>
+          <ExternalLink className="text-link reveal" href={experience.href}>
             Cone Crusaders code
-          </Out>
+          </ExternalLink>
           <div className="skills">
             {skills.map((group) => (
               <p className="reveal" key={group.label}>
@@ -236,10 +214,10 @@ export default function App() {
           <p className="section-label reveal">Contact</p>
           <h2 className="reveal">If the work fits, write me.</h2>
           <div className="contact-row reveal">
-            <Out href={`mailto:${profile.email}`}>{profile.email}</Out>
-            <Out href={profile.linkedin}>LinkedIn</Out>
-            <Out href={profile.github}>GitHub</Out>
-            <Out href={profile.resume}>Resume PDF</Out>
+            <ExternalLink href={`mailto:${profile.email}`}>{profile.email}</ExternalLink>
+            <ExternalLink href={profile.linkedin}>LinkedIn</ExternalLink>
+            <ExternalLink href={profile.github}>GitHub</ExternalLink>
+            <ExternalLink href={profile.resume}>Resume PDF</ExternalLink>
           </div>
           <p className="fine reveal">
             {profile.location} · {profile.phone}
@@ -247,28 +225,29 @@ export default function App() {
         </section>
       </main>
 
-      {open ? <ProjectPanel project={open} onClose={() => setOpenId(null)} /> : null}
+      {openProject ? <ProjectPanel project={openProject} onClose={() => setOpenId(null)} /> : null}
     </>
   )
 }
 
 function ProjectPanel({ project, onClose }) {
   useEffect(() => {
-    const onKey = (event) => {
+    function closeOnEscape(event) {
       if (event.key === "Escape") onClose()
     }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+
+    window.addEventListener("keydown", closeOnEscape)
+    return () => window.removeEventListener("keydown", closeOnEscape)
   }, [onClose])
 
   return (
-    <div className="scrim" onClick={onClose} role="presentation">
-      <article className="panel" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="project-title">
+    <div className="scrim" onClick={onClose}>
+      <article className="panel" onClick={(event) => event.stopPropagation()}>
         <button type="button" className="close" onClick={onClose}>
           Close
         </button>
         <p className="eyebrow">{project.kicker}</p>
-        <h2 id="project-title">{project.title}</h2>
+        <h2>{project.title}</h2>
         <p className="dates">{project.dates}</p>
         <p className="lede">{project.overview}</p>
         <h3>How it works</h3>
@@ -287,8 +266,8 @@ function ProjectPanel({ project, onClose }) {
           ))}
         </ul>
         <div className="panel-links">
-          {project.href ? <Out href={project.href}>Open the repository</Out> : null}
-          <Out href={`mailto:${profile.email}`}>Email me about this</Out>
+          {project.href ? <ExternalLink href={project.href}>Open the repository</ExternalLink> : null}
+          <ExternalLink href={`mailto:${profile.email}`}>Email me about this</ExternalLink>
         </div>
       </article>
     </div>
